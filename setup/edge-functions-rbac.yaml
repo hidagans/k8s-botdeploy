@@ -10,7 +10,7 @@ metadata:
   name: edge-functions-role
 rules:
 - apiGroups: [""]
-  resources: ["nodes", "pods", "services"]
+  resources: ["namespaces", "nodes", "pods", "services", "secrets"]
   verbs: ["get", "list", "watch", "create", "delete"]
 - apiGroups: ["apps"]
   resources: ["deployments"]
