@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot-${BOT_ID}
+  namespace: bots
+  labels:
+    app: bot
+    bot-id: ${BOT_ID}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bot
+      bot-id: ${BOT_ID}
+  template:
+    metadata:
+      labels:
+        app: bot
+        bot-id: ${BOT_ID}
+    spec:
+      containers:
+      - name: bot
+        image: ${IMAGE}
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env:
+        - name: BOT_ID
+          value: ${BOT_ID}
+        - name: DEPLOYMENT_ID
+          value: ${DEPLOYMENT_ID}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      imagePullSecrets:
+      - name: registry-secret

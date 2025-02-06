@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bot-${BOT_ID}
+  namespace: bots
+  labels:
+    app: bot
+    bot-id: ${BOT_ID}
+spec:
+  selector:
+    app: bot
+    bot-id: ${BOT_ID}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
