@@ -2,7 +2,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: code-server-storage
-provisioner: k8s.io/minikube-hostpath
+provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
 reclaimPolicy: Retain
 allowVolumeExpansion: true
@@ -21,8 +21,9 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   storageClassName: code-server-storage
-  local:
+  hostPath:
     path: /data/code-server
+    type: DirectoryOrCreate
   nodeAffinity:
     required:
       nodeSelectorTerms:
