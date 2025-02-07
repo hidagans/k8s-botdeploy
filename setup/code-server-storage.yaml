@@ -1,7 +1,7 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: code-server-storage
+  name: code-server-storage-local
 provisioner: k8s.io/minikube-hostpath
 volumeBindingMode: WaitForFirstConsumer
 reclaimPolicy: Retain
@@ -20,7 +20,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: code-server-storage
+  storageClassName: code-server-storage-local
   hostPath:
     path: /data/code-server-0
     type: DirectoryOrCreate
