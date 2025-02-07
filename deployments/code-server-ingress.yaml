@@ -1,11 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: code-${BOT_ID}
+  name: code-server
   namespace: bots
   labels:
     app: code-server
-    bot-id: ${BOT_ID}
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
@@ -16,16 +15,16 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - ${BOT_ID}.code.autobotdeploy.com
+    - code.autobotdeploy.com
     secretName: code-server-tls
   rules:
-  - host: ${BOT_ID}.code.autobotdeploy.com
+  - host: code.autobotdeploy.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: code-${BOT_ID}
+            name: code-server
             port:
               number: 80
