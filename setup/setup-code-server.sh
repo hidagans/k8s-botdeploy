@@ -15,10 +15,34 @@ echo -e "${YELLOW}Setting up RBAC...${NC}"
 kubectl apply -f code-server-rbac.yaml
 kubectl wait --for=condition=established --timeout=60s crd/clusterissuers.cert-manager.io
 
-# Create data directory on host
-echo -e "${YELLOW}Creating data directory...${NC}"
+# Create persistent storage directory
+echo -e "${YELLOW}Creating storage directory...${NC}"
 sudo mkdir -p /data/code-server
-sudo chmod 777 /data/code-server
+sudo chmod 755 /data/code-server
+sudo chown 1000:1000 /data/code-server
+
+# Create cleanup script
+echo -e "${YELLOW}Creating cleanup script...${NC}"
+cat > /usr/local/bin/cleanup-code-server << 'EOF'
+#!/bin/bash
+
+BOT_ID=$1
+
+if [ -z "$BOT_ID" ]; then
+  echo "Usage: cleanup-code-server <bot-id>"
+  exit 1
+fi
+
+# Delete all resources with the bot-id label
+kubectl delete all,pvc,ingress -n bots -l bot-id=$BOT_ID --grace-period=0 --force || true
+
+# Clean up storage directory
+rm -rf /data/code-server/$BOT_ID
+
+echo "Cleanup completed for bot $BOT_ID"
+EOF
+
+chmod +x /usr/local/bin/cleanup-code-server
 
 # Apply storage configuration
 echo -e "${YELLOW}Setting up storage...${NC}"
