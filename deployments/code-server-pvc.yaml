@@ -6,7 +6,8 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  volumeMode: Filesystem
   storageClassName: code-server-storage
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi

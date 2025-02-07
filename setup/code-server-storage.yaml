@@ -2,21 +2,31 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: code-server-storage
-provisioner: kubernetes.io/no-provisioner
+provisioner: k8s.io/minikube-hostpath
 volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: code-server-pv
   namespace: bots
+  labels:
+    type: local
 spec:
   capacity:
-    storage: 10Gi
+    storage: 30Gi
   accessModes:
     - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Delete
   storageClassName: code-server-storage
-  hostPath:
-    path: /data/code-server
-    type: DirectoryOrCreate
+  local:
+    path: /tmp/code-server
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - minikube
