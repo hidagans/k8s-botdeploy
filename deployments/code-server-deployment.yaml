@@ -24,7 +24,9 @@ spec:
       tolerations:
       - key: "CriticalAddonsOnly"
         operator: "Exists"
-        effect: "NoExecute"
+      - key: "node-role.kubernetes.io/control-plane"
+        operator: "Exists"
+        effect: "NoSchedule"
       containers:
       - name: code-server
         image: codercom/code-server:latest
@@ -40,15 +42,11 @@ spec:
           value: "/home/coder"
         - name: BOT_ID
           value: ${BOT_ID}
-        - name: DEPLOYMENT_ID
-          value: ${DEPLOYMENT_ID}
         - name: REPO_URL
           value: ${REPO_URL}
         volumeMounts:
         - name: code-server-data
           mountPath: /home/coder/project
-        - name: nginx-config
-          mountPath: /etc/nginx/conf.d
         resources:
           requests:
             memory: "512Mi"
@@ -85,6 +83,3 @@ spec:
       - name: code-server-data
         persistentVolumeClaim:
           claimName: code-${BOT_ID}-pvc
-      - name: nginx-config
-        configMap:
-          name: code-server-nginx-config

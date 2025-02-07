@@ -2,7 +2,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: code-server-storage
-provisioner: kubernetes.io/host-path
+provisioner: k8s.io/minikube-hostpath
 volumeBindingMode: WaitForFirstConsumer
 reclaimPolicy: Retain
 allowVolumeExpansion: true
@@ -13,7 +13,7 @@ metadata:
   name: code-server-pv
   namespace: bots
   labels:
-    type: hostpath
+    type: local
 spec:
   capacity:
     storage: 30Gi
@@ -21,9 +21,8 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   storageClassName: code-server-storage
-  hostPath:
+  local:
     path: /data/code-server
-    type: DirectoryOrCreate
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -31,4 +30,4 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - ubuntu20  # Using the actual node name
+          - ubuntu20
