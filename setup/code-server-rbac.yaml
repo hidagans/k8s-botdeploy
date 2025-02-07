@@ -5,31 +5,32 @@ metadata:
   namespace: bots
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   name: code-server-role
-  namespace: bots
 rules:
 - apiGroups: [""]
-  resources: ["pods", "services", "persistentvolumeclaims", "secrets", "configmaps"]
+  resources: ["pods", "services", "persistentvolumeclaims", "secrets", "configmaps", "namespaces"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: ["apps"]
-  resources: ["deployments"]
+  resources: ["deployments", "replicasets"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: ["networking.k8s.io"]
   resources: ["ingresses"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: code-server-binding
-  namespace: bots
 subjects:
 - kind: ServiceAccount
   name: code-server
   namespace: bots
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: code-server-role
   apiGroup: rbac.authorization.k8s.io
