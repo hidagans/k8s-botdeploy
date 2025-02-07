@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: code-${BOT_ID}
+  namespace: bots
+  labels:
+    app: code-server
+    bot-id: ${BOT_ID}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: code-server
+      bot-id: ${BOT_ID}
+  template:
+    metadata:
+      labels:
+        app: code-server
+        bot-id: ${BOT_ID}
+    spec:
+      serviceAccountName: code-server
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: code-server
+        image: codercom/code-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PASSWORD
+          value: ${PASSWORD}
+        - name: BOT_ID
+          value: ${BOT_ID}
+        - name: DEPLOYMENT_ID
+          value: ${DEPLOYMENT_ID}
+        - name: REPO_URL
+          value: ${REPO_URL}
+        volumeMounts:
+        - name: code-server-data
+          mountPath: /home/coder/project
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - "/bin/sh"
+              - "-c"
+              - |
+                cd /home/coder/project && \
+                git clone ${REPO_URL} . && \
+                code-server --install-extension ms-python.python && \
+                code-server --install-extension dbaeumer.vscode-eslint && \
+                code-server --install-extension esbenp.prettier-vscode
+      volumes:
+      - name: code-server-data
+        persistentVolumeClaim:
+          claimName: code-${BOT_ID}-pvc
+      - name: nginx-config
+        configMap:
+          name: code-server-nginx-config

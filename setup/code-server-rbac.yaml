@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: code-server
+  namespace: bots
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: code-server-role
+  namespace: bots
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: code-server-binding
+  namespace: bots
+subjects:
+- kind: ServiceAccount
+  name: code-server
+  namespace: bots
+roleRef:
+  kind: Role
+  name: code-server-role
+  apiGroup: rbac.authorization.k8s.io

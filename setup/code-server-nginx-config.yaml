@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: code-server-nginx-config
+  namespace: bots
+data:
+  proxy.conf: |
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+    proxy_read_timeout 86400;
+    proxy_send_timeout 86400;
+    proxy_connect_timeout 86400;
