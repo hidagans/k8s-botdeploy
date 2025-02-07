@@ -2,7 +2,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: code-server-storage-local
-provisioner: k8s.io/minikube-hostpath
+provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
 reclaimPolicy: Retain
 allowVolumeExpansion: true
@@ -31,4 +31,4 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - ubuntu20  # Make sure this matches your node name
+          - ubuntu20  # Replace with your actual node name
