@@ -2,7 +2,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: code-server-storage
-provisioner: kubernetes.io/no-provisioner
+provisioner: kubernetes.io/host-path
 volumeBindingMode: WaitForFirstConsumer
 reclaimPolicy: Retain
 allowVolumeExpansion: true
@@ -24,9 +24,6 @@ spec:
   hostPath:
     path: /data/code-server
     type: DirectoryOrCreate
-  claimRef:
-    namespace: bots
-    name: code-server-pv-claim
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -34,4 +31,4 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - node1  # Replace with your actual node name
+          - ubuntu20  # Using the actual node name

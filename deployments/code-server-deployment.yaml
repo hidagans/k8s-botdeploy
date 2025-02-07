@@ -21,6 +21,10 @@ spec:
       serviceAccountName: code-server
       securityContext:
         fsGroup: 1000
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoExecute"
       containers:
       - name: code-server
         image: codercom/code-server:latest
@@ -30,6 +34,10 @@ spec:
         env:
         - name: PASSWORD
           value: ${PASSWORD}
+        - name: SHELL
+          value: "/bin/bash"
+        - name: HOME
+          value: "/home/coder"
         - name: BOT_ID
           value: ${BOT_ID}
         - name: DEPLOYMENT_ID
@@ -63,15 +71,16 @@ spec:
         lifecycle:
           postStart:
             exec:
-              command:
-              - "/bin/sh"
-              - "-c"
-              - |
+              command: ["/bin/bash", "-c", "
+                mkdir -p /home/coder/project && \
                 cd /home/coder/project && \
-                git clone ${REPO_URL} . && \
-                code-server --install-extension ms-python.python && \
-                code-server --install-extension dbaeumer.vscode-eslint && \
-                code-server --install-extension esbenp.prettier-vscode
+                if [ ! -d .git ]; then \
+                  git clone ${REPO_URL} . || echo 'Repository already exists'; \
+                fi && \
+                code-server --install-extension ms-python.python || true && \
+                code-server --install-extension dbaeumer.vscode-eslint || true && \
+                code-server --install-extension esbenp.prettier-vscode || true
+              "]
       volumes:
       - name: code-server-data
         persistentVolumeClaim:
